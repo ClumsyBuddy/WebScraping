@@ -1,5 +1,6 @@
 from notify_run import Notify
 
-notify = Notify()
+n = Notify()
 
-notify.send("Hello World")
+n.read_config()
+n.send("Hey cutey")

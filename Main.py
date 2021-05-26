@@ -55,7 +55,6 @@ class WebScrapper:
             if button.text != "Sold Out":
                 self.WebData.notify.send(_Name.text, button.text)
 
-
     #This Function get the webpage and reloads it
     #if it fails it prints a log then stops the loop
     def Get_Page(self):
@@ -70,7 +69,6 @@ class WebScrapper:
 
 
 def main():
-
     #Create instance of class holding informtation to for webscraping
     _Data = WebscrapperData()
     #First we start the thread to get key presses
