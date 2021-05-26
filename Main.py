@@ -23,13 +23,55 @@ class WebscrapperData:
         self.RTX3060 = 'https://www.bestbuy.com/site/searchpage.jsp?_dyncharset=UTF-8&id=pcat17071&iht=y&keys=keys&ks=960&list=n&qp=currentprice_facet%3DPrice~%24250%20-%20%24499.99%5Egpusv_facet%3DGraphics%20Processing%20Unit%20(GPU)~NVIDIA%20GeForce%20RTX%203060%5Egpusv_facet%3DGraphics%20Processing%20Unit%20(GPU)~NVIDIA%20GeForce%20RTX%203060%20Ti&sc=Global&st=rtx%203060&type=page&usc=All%20Categories'
         self.Item = Items
 
+
+class WebScrapper:
+    def __init__(self, WebData, StartDelay, EndDelay, _Item):
+        self.WebData = WebData
+        self.StartDelay = StartDelay
+        self.EndDelay = EndDelay
+        self._Item = _Item
+
+    def Task_GetPage(self):
+    #sleep(StartDelay) #Delay to space the threads
+        while self.WebData.ContinueLooping == True:
+            print("Getting Information")
+            self.CheckItem()
+            soup = BeautifulSoup(self.WebData.driver.page_source, "html.parser")
+            for post in soup.find_all("li", class_="sku-item"):
+                div = post.find('div', class_="sku-title")
+                h4 = div.find('h4', class_="sku-header")
+                _Name = h4.find('a')
+                button = post.find("button", class_="add-to-cart-button")
+                print("---------------------")
+                print(_Name.text)
+                print(button.text)
+                print("---------------------")
+                if button.text == "Sold Out":
+                    print("Sold out")
+            #sleep(Delay) #Delay so we arent grabbing the site faster than allowed
+        self.WebData.driver.quit() #Closes webdriver
+
+    def CheckItem(self):
+        if self._Item == self.WebData.Item.RTX1660:
+            self.WebData.driver.get(self.WebData.RTX1660)
+        elif self._Item == self.WebData.Item.RTX3060:
+            self.WebData.driver.get(self.WebData.RTX3060)
+        else:
+            print("Couldn't get webpage")
+
+
+
+
 def main():
     #Create instance of class holding informtation to for webscraping
     _Data = WebscrapperData()
+
+    a = WebScrapper(_Data, 0 , 60, _Data.Item.RTX3060)
+
     #Create threads to for checking key presses and running the webscraper
     Task_KeyCheck = threading.Thread(target=KeyCheck, args=(_Data, 0.05,))  #Takes class we made a arguement and a delay  
-    Task_GTX3060 = threading.Thread(target=Task_GetPage, args=(_Data, 0 , 60, _Data.Item.RTX3060,))
-    #Task_GTX1660TI = threading.Thread(target=Task_GetPage, args=(_Data, 60 , 60,))
+    Task_GTX3060 = threading.Thread(target=a.Task_GetPage())
+    #Task_GTX1660TI = threading.Thread(target=Task_GetPage, args=("1660", _Data, 30 , 60, _Data.Item.RTX1660,))
     #Start them
     Task_KeyCheck.start()
     Task_GTX3060.start()
@@ -44,40 +86,8 @@ def KeyCheck(KeyData, Delay=0.05):
         if keyboard.is_pressed("l"):
             KeyData.ContinueLooping = False
             print("Exiting app")
-        sleep(0.10)
+        #sleep(0.10)
 
-#Get the html page with a headless client
-#Parse the html with bs4
-#Search a set of tags to find specific information
-def Task_GetPage(WebData, StartDelay, Delay, _Item):
-    sleep(StartDelay) #Delay to space the threads
-    while WebData.ContinueLooping == True:
-        print("Getting Information")
-        CheckItem(WebData, _Item)
-        soup = BeautifulSoup(WebData.driver.page_source, "html.parser")
-        for post in soup.find_all("li", class_="sku-item"):
-            div = post.find('div', class_="sku-title")
-            h4 = div.find('h4', class_="sku-header")
-            Name = h4.find('a')
-            button = post.find("button", class_="add-to-cart-button")
-            print("---------------------")
-            print(Name.text)
-            print(button.text)
-            print("---------------------")
-        sleep(Delay) #Delay so we arent grabbing the site faster than allowed
-    WebData.driver.quit() #Closes webdriver
-
-
-
-
-def CheckItem(_Data, _Item):
-    if _Item == _Data.Item.RTX1660:
-        _Data.driver.get(_Data.RTX1660)
-    elif _Item == _Data.Item.RTX3060:
-        _Data.driver.get(_Data.RTX3060)
-    else:
-        print("Couldn't get webpage")
-    
 
 
 
