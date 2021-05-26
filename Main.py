@@ -14,29 +14,27 @@ class WebscrapperData:
     def __init__(self):
         self.ContinueLooping = True #Used to exit the program
         self.DRIVER_PATH = "D:\\Coding Projects\\WebScraping\\chromedriver.exe" #Path to the google driver
-        self.ChromeOptions = Options() #OPtions object
-        self.ChromeOptions.add_argument('log-level=3') #Changes the log level to keep console clear
-        self.ChromeOptions.add_argument("--window-size=1920,1080") #Sets the display size of the client
-        self.ChromeOptions.headless = True #Make the client headless
-        self.driver = webdriver.Chrome(options=self.ChromeOptions, executable_path=self.DRIVER_PATH) #Create the driver
         self.RTX1660 = 'https://www.bestbuy.com/site/searchpage.jsp?st=1660+ti&_dyncharset=UTF-8&_dynSessConf=&id=pcat17071&type=page&sc=Global&cp=1&nrp=&sp=&qp=&list=n&af=true&iht=y&usc=All+Categories&ks=960&keys=keys'
         self.RTX3060 = 'https://www.bestbuy.com/site/searchpage.jsp?_dyncharset=UTF-8&id=pcat17071&iht=y&keys=keys&ks=960&list=n&qp=currentprice_facet%3DPrice~%24250%20-%20%24499.99%5Egpusv_facet%3DGraphics%20Processing%20Unit%20(GPU)~NVIDIA%20GeForce%20RTX%203060%5Egpusv_facet%3DGraphics%20Processing%20Unit%20(GPU)~NVIDIA%20GeForce%20RTX%203060%20Ti&sc=Global&st=rtx%203060&type=page&usc=All%20Categories'
         self.Item = Items
 
 
 class WebScrapper:
-    def __init__(self, WebData, StartDelay, EndDelay, _Item):
+    def __init__(self, ItemName, WebData, _Item):
+        self.ItemName = ItemName
         self.WebData = WebData
-        self.StartDelay = StartDelay
-        self.EndDelay = EndDelay
         self._Item = _Item
+        self.ChromeOptions = Options() #OPtions object
+        self.ChromeOptions.add_argument('log-level=3') #Changes the log level to keep console clear
+        self.ChromeOptions.add_argument("--window-size=1920,1080") #Sets the display size of the client
+        self.ChromeOptions.headless = True #Make the client headless
+        self.driver = webdriver.Chrome(options=self.ChromeOptions, executable_path=self.WebData.DRIVER_PATH) #Create the driver
 
     def Task_GetPage(self):
-    #sleep(StartDelay) #Delay to space the threads
         while self.WebData.ContinueLooping == True:
-            print("Getting Information")
+            print("Getting Information: ", self.ItemName)
             self.CheckItem()
-            soup = BeautifulSoup(self.WebData.driver.page_source, "html.parser")
+            soup = BeautifulSoup(self.driver.page_source, "html.parser")
             for post in soup.find_all("li", class_="sku-item"):
                 div = post.find('div', class_="sku-title")
                 h4 = div.find('h4', class_="sku-header")
@@ -48,17 +46,15 @@ class WebScrapper:
                 print("---------------------")
                 if button.text == "Sold Out":
                     print("Sold out")
-            #sleep(Delay) #Delay so we arent grabbing the site faster than allowed
-        self.WebData.driver.quit() #Closes webdriver
+        self.driver.quit() #Closes webdriver
 
     def CheckItem(self):
         if self._Item == self.WebData.Item.RTX1660:
-            self.WebData.driver.get(self.WebData.RTX1660)
+            self.driver.get(self.WebData.RTX1660)
         elif self._Item == self.WebData.Item.RTX3060:
-            self.WebData.driver.get(self.WebData.RTX3060)
+            self.driver.get(self.WebData.RTX3060)
         else:
             print("Couldn't get webpage")
-
 
 
 
@@ -66,28 +62,28 @@ def main():
     #Create instance of class holding informtation to for webscraping
     _Data = WebscrapperData()
 
-    a = WebScrapper(_Data, 0 , 60, _Data.Item.RTX3060)
+    GPU3060 = WebScrapper("3060", _Data, _Data.Item.RTX3060)
+    GPU1660 = WebScrapper("1660", _Data, _Data.Item.RTX1660)
 
     #Create threads to for checking key presses and running the webscraper
-    Task_KeyCheck = threading.Thread(target=KeyCheck, args=(_Data, 0.05,))  #Takes class we made a arguement and a delay  
-    Task_GTX3060 = threading.Thread(target=a.Task_GetPage())
-    #Task_GTX1660TI = threading.Thread(target=Task_GetPage, args=("1660", _Data, 30 , 60, _Data.Item.RTX1660,))
-    #Start them
+    Task_KeyCheck = threading.Thread(target=KeyCheck, args=(_Data,))
     Task_KeyCheck.start()
+
+    Task_GTX3060 = threading.Thread(target=GPU3060.Task_GetPage)
     Task_GTX3060.start()
-    #Task_GTX1660TI.start()
 
+    sleep(10)
 
+    Task_GTX1660TI = threading.Thread(target=GPU1660.Task_GetPage)
+    Task_GTX1660TI.start()
     
-#If the program is to continue looping check for key press to stop looping
-def KeyCheck(KeyData, Delay=0.05):
-    KeyData.ContinueLooping = True
-    while KeyData.ContinueLooping == True:
+    
+def KeyCheck(Data):
+    while Data.ContinueLooping == True:
         if keyboard.is_pressed("l"):
-            KeyData.ContinueLooping = False
+            Data.ContinueLooping = False
             print("Exiting app")
-        #sleep(0.10)
-
+        #sleep(0.10)yCheck():
 
 
 
