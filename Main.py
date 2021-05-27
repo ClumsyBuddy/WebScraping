@@ -70,8 +70,6 @@ class WebScrapper:
             self.WebData.ContinueLooping = False
 
 
-
-
 def main():
     #Create instance of class holding informtation to for webscraping
     _Data = WebscrapperData()
