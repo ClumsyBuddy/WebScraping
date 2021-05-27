@@ -13,6 +13,7 @@ class Items: #This is how I check what item I am on
 class WebscrapperData: #This holds data for the Webscrapper, still moving things back and forth
     def __init__(self):
         self.ContinueLooping = True #Used to exit the program
+        self.ItemAv = False
         self.notify = Notify()
         self.DRIVER_PATH = "D:\\Coding Projects\\WebScraping\\chromedriver.exe" #Path to the google driver
         self.ChromeOptions = Options() #OPtions object
@@ -53,7 +54,10 @@ class WebScrapper:
             print(_Name.text)
             print(button.text)
             if button.text != "Sold Out":
-                self.WebData.notify.send(_Name.text, button.text)
+                self.WebData.notify.send(_Name, button.text)
+                self.WebData.ItemAv = True
+        if self.WebData.ItemAv == True:
+            sleep(600)
 
     #This Function get the webpage and reloads it
     #if it fails it prints a log then stops the loop
