@@ -21,8 +21,8 @@ class WebscrapperData: #This holds data for the Webscrapper, still moving things
         self.ChromeOptions.add_argument("--window-size=1920,1080") #Sets the display size of the client
         self.ChromeOptions.headless = True #Make the client headless
         self.ItemDict = {
-            1 : 'https://www.bestbuy.com/site/searchpage.jsp?st=1660+ti&_dyncharset=UTF-8&_dynSessConf=&id=pcat17071&type=page&sc=Global&cp=1&nrp=&sp=&qp=&list=n&af=true&iht=y&usc=All+Categories&ks=960&keys=keys',
-            2 : 'https://www.bestbuy.com/site/searchpage.jsp?_dyncharset=UTF-8&id=pcat17071&iht=y&keys=keys&ks=960&list=n&qp=currentprice_facet%3DPrice~%24250%20-%20%24499.99%5Egpusv_facet%3DGraphics%20Processing%20Unit%20(GPU)~NVIDIA%20GeForce%20RTX%203060%5Egpusv_facet%3DGraphics%20Processing%20Unit%20(GPU)~NVIDIA%20GeForce%20RTX%203060%20Ti&sc=Global&st=rtx%203060&type=page&usc=All%20Categories'
+            1 : 'https://www.bestbuy.com/site/searchpage.jsp?_dyncharset=UTF-8&id=pcat17071&iht=y&keys=keys&ks=960&list=n&qp=currentprice_facet%3DPrice~%24250%20-%20%24499.99%5Egpusv_facet%3DGraphics%20Processing%20Unit%20(GPU)~NVIDIA%20GeForce%20RTX%203060%5Egpusv_facet%3DGraphics%20Processing%20Unit%20(GPU)~NVIDIA%20GeForce%20RTX%203060%20Ti&sc=Global&st=rtx%203060&type=page&usc=All%20Categories',
+            2 : 'https://www.bestbuy.com/site/searchpage.jsp?st=1660+super&_dyncharset=UTF-8&_dynSessConf=&id=pcat17071&type=page&sc=Global&cp=1&nrp=&sp=&qp=&list=n&af=true&iht=y&usc=All+Categories&ks=960&keys=keys'
         }
         self.Item = Items
        
@@ -96,8 +96,8 @@ def main():
         _tasks.start()
         sleep(15)
 
-    while _Data.ContinueLooping == True:
-        sleep(0.10)
+    for _tasks in Tasks:
+        _tasks.join()
     print("Exiting Program")
     
 #This function constantly checks for certain key presses and Sets the variable continuelooping to false
